@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postfix-mail-service
+  labels:
+    app: postfix-mail
+spec:
+  ports:
+    - port: 25
+  selector:
+    app: postfix-mail
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: postfix-mail
+  labels:
+    app: postfix-mail
+spec:
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: postfix-mail
+    spec:
+      containers:
+      - image: catatnight/postfix
+        name: postfix-mail
+        env:
+          - name: maildomain
+            value: mail.yourdonmain.com
+          - name: smtp_user
+            value: "user:password"
+        ports:
+        - containerPort: 25
+          hostPort: 25
+          name: mail-port
+        
+      nodeSelector:
+        mail: "true"
+
